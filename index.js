@@ -8,9 +8,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json());
 
 // Constantes de locução
-const FASTSPEECH = 740;
-const MEDIUMSPEECH = 700;
-const SLOWSPEECH = 660;
+const FASTSPEECH = 950;
+const MEDIUMSPEECH = 920;
+const SLOWSPEECH = 890;
 
 // Banco SQLite
 const path = require('path');
@@ -75,9 +75,9 @@ function analyze(text, mode) {
   if (mode === 'fast') { speed = FASTSPEECH; label = 'Rápido'; }
   if (mode === 'slow') { speed = SLOWSPEECH; label = 'Devagar'; }
 
-  const time = formatTime(charNoSpace / speed);
+  const time = formatTime(charCount / speed);
 
-  return { wordCount, charCount, charNoSpace, sentences, paragraphs, topWords, time, label };
+  return { wordCount, charCount, charNoSpace, sentences, paragraphs, topWords, time, label, speed };
 }
 
 function renderPage(content = '') {
@@ -143,15 +143,15 @@ async function update() {
 
   const r = await res.json();
 
-  statsEl.innerHTML = '\
-    <p>Quantidade de palavras: ' + r.wordCount + '</p>\
-    <p>Quantidade de toques: ' + r.charCount + '</p>\
-    <p>Quantidade de caracteres (exceto espaços): ' + r.charNoSpace + '</p>\
-    <p>Quantidade de frases: ' + r.sentences + '</p>\
-    <p>Quantidade de parágrafos: ' + r.paragraphs + '</p>\
-    <p>Palavras mais frequentes: ' + r.topWords.join(', ') + '</p>\
-    <p>Tempo de locução: ' + r.time + ' no modo ' + r.label + '</p>';
-
+statsEl.innerHTML =
+  '<p>Quantidade de toques: ' + r.charCount + '</p>' +
+  '<p>Quantidade de palavras: ' + r.wordCount + '</p>' +
+  '<p>Quantidade de caracteres (exceto espaços): ' + r.charNoSpace + '</p>' +
+  '<p>Quantidade de frases: ' + r.sentences + '</p>' +
+  '<p>Quantidade de parágrafos: ' + r.paragraphs + '</p>' +
+  '<p>Tempo de locução: ' + r.time + '</p>' +
+  '<p>Velocidade de locução: ' + r.speed + ' toques/min</p><br>' +
+  '<p>Palavras mais frequentes: ' + r.topWords.join(', ') + '</p>';
 }
 
 textEl.addEventListener('input', update);
